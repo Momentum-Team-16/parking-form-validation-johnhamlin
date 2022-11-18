@@ -9,10 +9,11 @@
   <body>
     <div class="container">
       <h1>Pre-paid Parking Form</h1>
-      <form id="parking-form">
+      <!-- novalidate to allow js validation -->
+      <form id="parking-form" novalidate>
         <div class="input-field" id="name-field">
           <label for="name">Name</label>
-          <input id="name" type="text" _required_ />
+          <input id="name" type="text" required />
         </div>
         <div class="input-field" id="car-field">
           <label for="car-year">Car</label>
@@ -22,7 +23,7 @@
               type="number"
               min="1900"
               placeholder="Year"
-              _required_
+              required
             />
             <input id="car-make" type="text" placeholder="Make" _required_ />
             <input id="car-model" type="text" placeholder="Model" _required_ />
@@ -44,7 +45,12 @@
           <div class="col">
             <div class="input-field" id="cvv-field">
               <label for="cvv">CVV</label>
-              <input id="cvv" type="text" pattern="^\d{3}$" _required_ />
+              <input
+                id="cvv"
+                type="text"
+                _required_
+                title="Please enter a three digit number."
+              />
             </div>
           </div>
           <div class="col">
