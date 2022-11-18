@@ -12,7 +12,7 @@
       <form id="parking-form">
         <div class="input-field" id="name-field">
           <label for="name">Name</label>
-          <input id="name" type="text" required />
+          <input id="name" type="text" _required_ />
         </div>
         <div class="input-field" id="car-field">
           <label for="car-year">Car</label>
@@ -22,35 +22,40 @@
               type="number"
               min="1900"
               placeholder="Year"
-              required
+              _required_
             />
-            <input id="car-make" type="text" placeholder="Make" required />
-            <input id="car-model" type="text" placeholder="Model" required />
+            <input id="car-make" type="text" placeholder="Make" _required_ />
+            <input id="car-model" type="text" placeholder="Model" _required_ />
           </div>
         </div>
         <div class="input-field" id="start-date-field">
           <label for="start-date">Date parking</label>
-          <input id="start-date" type="date" required />
+          <input id="start-date" type="date" _required_ />
         </div>
         <div class="input-field" id="days-field">
           <label for="days">Number of days</label>
-          <input id="days" type="number" min="1" max="30" required />
+          <input id="days" type="number" min="1" max="30" _required_ />
         </div>
         <div class="input-field" id="credit-card-field">
           <label for="credit-card">Credit Card</label>
-          <input id="credit-card" type="text" required />
+          <input id="credit-card" type="text" _required_ />
         </div>
         <div class="row">
           <div class="col">
             <div class="input-field" id="cvv-field">
               <label for="cvv">CVV</label>
-              <input id="cvv" type="text" pattern="^\d{3}$" required />
+              <input id="cvv" type="text" pattern="^\d{3}$" _required_ />
             </div>
           </div>
           <div class="col">
             <div class="input-field" id="expiration-field">
               <label for="expiration">Expiration</label>
-              <input id="expiration" type="text" placeholder="MM/YY" required />
+              <input
+                id="expiration"
+                type="text"
+                placeholder="MM/YY"
+                _required_
+              />
             </div>
           </div>
         </div>
