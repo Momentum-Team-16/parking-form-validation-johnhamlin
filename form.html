@@ -17,7 +17,13 @@
         <div class="input-field" id="car-field">
           <label for="car-year">Car</label>
           <div class="input-group">
-            <input id="car-year" type="text" placeholder="Year" required />
+            <input
+              id="car-year"
+              type="number"
+              min="1900"
+              placeholder="Year"
+              required
+            />
             <input id="car-make" type="text" placeholder="Make" required />
             <input id="car-model" type="text" placeholder="Model" required />
           </div>
@@ -28,7 +34,7 @@
         </div>
         <div class="input-field" id="days-field">
           <label for="days">Number of days</label>
-          <input id="days" type="text" required />
+          <input id="days" type="number" min="1" max="30" required />
         </div>
         <div class="input-field" id="credit-card-field">
           <label for="credit-card">Credit Card</label>
