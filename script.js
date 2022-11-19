@@ -71,6 +71,11 @@ function luhnCheck(val) {
 }
 
 function validateForm(e) {
+  const today = new Date();
+  const todayMonth = today.getMonth();
+  const todayFullYear = today.getFullYear();
+  const todayShortYear = todayFullYear % 100;
+
   const fail = function (errorMsg) {
     e.parentElement.classList.add('input-invalid');
     e.setCustomValidity(errorMsg);
@@ -82,21 +87,14 @@ function validateForm(e) {
     e.setCustomValidity('');
   };
 
-  const checkExp = function (exp) {
-    // check for correct format
-    const expRegEx = /^((0[1-9])|(1[0-2]))\/\d\d$/;
-    if (!exp.match(expRegEx)) return false;
-    // if the format is correct, check the date
-    const today = new Date();
-    const todayMonth = today.getMonth();
-    const todayYear = today.getFullYear() % 100;
+  const checkExpDate = function (exp) {
     const expMonth = +exp.slice(0, 2);
     const expYear = +exp.slice(3);
     console.log(expMonth, expYear);
     // Ensure date is in the future
     if (
-      todayYear > expYear ||
-      (todayMonth >= expMonth && todayYear === expYear)
+      todayShortYear > expYear ||
+      (todayMonth >= expMonth && todayShortYear === expYear)
     )
       return false;
 
@@ -107,6 +105,7 @@ function validateForm(e) {
   const validators = {
     'car-year': function (e) {
       if (+e.value < 1900) fail('Please enter a year after 1899');
+      if (+e.value > todayFullYear + 1) fail('Car cannot be from the future');
       else pass();
     },
     days: function (e) {
@@ -124,8 +123,9 @@ function validateForm(e) {
       else pass();
     },
     expiration: function (e) {
-      if (!checkExp(e.value))
-        fail('Date must be in the future. Format must be MM/YY');
+      const expFormat = /^((0[1-9])|(1[0-2]))\/\d\d$/;
+      if (!e.value.match(expFormat)) fail('Format must be MM/YY');
+      else if (!checkExpDate(e.value)) fail('Date must be in the future.');
       else pass();
     },
   };
