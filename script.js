@@ -1,22 +1,23 @@
 'use strict';
 
+//////////////////////////////////////////////////
+//  DOM SELECTORS AND EVENT LISTENERS
+//////////////////////////////////////////////////
 const formContainer = document.querySelector('.container');
+const formInputs = Array.from(document.querySelectorAll('input'));
 formContainer.addEventListener('submit', makeReservation);
+// Validate form fields when input changes
 formContainer.addEventListener('change', e => {
-  console.log(e.target.id);
   validateForm(e.target);
 });
-// const allInputs = Array.from(document.querySelectorAll('input'));
-
-function makeReservation(event) {
-  event.preventDefault();
-  // if (!validateForm()) return false;
-  displayTotal(calculateTotal());
-}
 
 //////////////////////////////////////////////////
-//  Methods for Calculating and displaying Total
+//  FUNCTIONS TO CALCULATE AND DISPLAY TOTAL
 //////////////////////////////////////////////////
+/**
+ * It calculates the total price of a rental car based on the number of days and the start date
+ * @returns The total price of the rental.
+ */
 function calculateTotal() {
   // Array for looking up daily prices using 0-based values for days of the week starting with Sunday
   const prices = [7, 5, 5, 5, 5, 5, 7];
@@ -35,25 +36,43 @@ function calculateTotal() {
   return total;
 }
 
+/**
+ * It takes the value of the start date input, and returns a Date object with the time zone offset set
+ * to EST
+ * @returns A new Date object with the date and timezone specified by the user.
+ */
 function getStartDate() {
   // Constants for offsetting Date objects
   const EST = 'T05:00:00';
   const EDT = 'T04:00:00';
   const TIME_ZONE = EST;
   const dateInput = document.querySelector('#start-date').value;
+
   return new Date(`${dateInput}${TIME_ZONE}`);
 }
 
+/**
+ * If the totalDiv has a child node, then set totalEl to that child node, otherwise create a new
+ * paragraph element and set totalEl to that
+ * @param total - the total price of the items in the cart
+ */
 function displayTotal(total) {
   const totalDiv = document.querySelector('#total');
-  const totalEl = document.createElement('p');
+  const totalEl = totalDiv.hasChildNodes()
+    ? totalDiv.firstChild
+    : document.createElement('p');
   totalEl.innerText = `Your total is $${total}`;
   totalDiv.appendChild(totalEl);
 }
 
 //////////////////////////////////////////////////
-// Credit Card Methods
+// CREDIT CARD VALIDATION
 //////////////////////////////////////////////////
+/**
+ * If the number is 16 digits long and passes the Luhn check, then it's valid
+ * @param number - The credit card number
+ * @returns A boolean value.
+ */
 function validateCardNumber(number) {
   var regex = new RegExp('^[0-9]{16}$');
   if (!regex.test(number)) return false;
@@ -61,6 +80,11 @@ function validateCardNumber(number) {
   return luhnCheck(number);
 }
 
+/**
+ * Runs the Luhn algorithm to validate a credit card number.
+ * @param val - The credit card number to validate.
+ * @returns boolean
+ */
 function luhnCheck(val) {
   var sum = 0;
   for (var i = 0; i < val.length; i++) {
@@ -76,6 +100,28 @@ function luhnCheck(val) {
   return sum % 10 == 0;
 }
 
+//////////////////////////////////////////////////
+// FROM VALIDATION / EVENT HANDLERS
+//////////////////////////////////////////////////
+/**
+ * "If all the form inputs pass validation, display the total."
+ *
+ * The first line of the function prevents the default behavior of the form submission
+ * @param event - The event object that is passed to the event handler.
+ * @returns false if any of the form inputs fail validation.
+ */
+function makeReservation(event) {
+  event.preventDefault();
+  // Run validation on every input node and return early if any tests fail.
+  if (!formInputs.every(input => validateForm(input))) return false;
+  displayTotal(calculateTotal());
+}
+
+/**
+ * If the input is valid, return true, otherwise return false
+ * @param e - The form element that is being validated.
+ * @returns boolean.
+ */
 function validateForm(e) {
   const today = new Date();
   const todayMonth = today.getMonth();
@@ -91,12 +137,12 @@ function validateForm(e) {
   const pass = function () {
     e.parentElement.classList.remove('input-invalid');
     e.setCustomValidity('');
+    return true;
   };
 
   const checkExpDate = function (exp) {
     const expMonth = +exp.slice(0, 2);
     const expYear = +exp.slice(3);
-    console.log(expMonth, expYear);
     // Ensure date is in the future
     if (
       todayShortYear > expYear ||
@@ -109,44 +155,58 @@ function validateForm(e) {
 
   // List of validation tests for each form item keyed by id
   const validators = {
+    name: function (e) {
+      if (e.value == '') fail('Please enter your name');
+      else return pass();
+    },
     'car-year': function (e) {
       if (+e.value < 1900) fail('Please enter a year after 1899');
-      if (+e.value > todayFullYear + 1) fail('Car cannot be from the future');
-      else pass();
+      else if (+e.value > todayFullYear + 1)
+        fail('Car cannot be from the future');
+      else if (e.value == '') fail('Please enter the year.');
+      else return pass();
+    },
+    'car-make': function (e) {
+      if (e.value == '') fail('Please enter the make');
+      else return pass();
+    },
+    'car-model': function (e) {
+      if (e.value == '') fail('Please enter the model');
+      else return pass();
     },
     'start-date': function (e) {
-      if (getStartDate() < today) fail('Date must be in the future');
-      else pass();
+      if (e.value == '') fail('Please enter the start date');
+      else if (getStartDate() < today) fail('Date must be in the future');
+      else return pass();
     },
     days: function (e) {
       if (+e.value < 1 || +e.value > 30)
         fail('Spaces are available for 1-30 days');
-      else pass();
+      else return pass();
     },
     'credit-card': function (e) {
       if (!validateCardNumber(e.value))
         fail('Enter a valid credit card number.');
-      else pass();
+      else return pass();
     },
     cvv: function (e) {
       if (!e.value.match(/^\d{3}$/)) fail('Please enter a three digit CVV');
-      else pass();
+      else return pass();
     },
     expiration: function (e) {
       const expFormat = /^((0[1-9])|(1[0-2]))\/\d\d$/;
-      if (!e.value.match(expFormat)) fail('Format must be MM/YY');
+      if (e.value == '') fail('Please enter the expiration date');
+      else if (!e.value.match(expFormat)) fail('Format must be MM/YY');
       else if (!checkExpDate(e.value)) fail('Date must be in the future.');
-      else pass();
+      else return pass();
     },
   };
-  validators[e.id]?.(e);
-  console.log(e.checkValidity()); // maybe check for blank separately
+  // Don't think this is needed anymore. Not relying on html required tags
+  // if (!e.checkValidity()) fail('This field is required');
+  // else pass(); // maybe check for blank separately
 
-  // Check every <div> for required tag (or any other validation, which will lead to a misleading error message)
-  // if (!allInputs.every(e => e.checkValidity())) {
-  //   alert('Please fill out all the fields');
-  //   return false;
-  // }
+  // If any of the tests failed, return false
+  if (!validators[e.id]?.(e)) return false;
 
   return true;
 }

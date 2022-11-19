@@ -13,33 +13,27 @@
       <form id="parking-form" novalidate>
         <div class="input-field" id="name-field">
           <label for="name">Name</label>
-          <input id="name" type="text" required />
+          <input id="name" type="text" />
         </div>
         <div class="input-field" id="car-field">
           <label for="car-year">Car</label>
           <div class="input-group">
-            <input
-              id="car-year"
-              type="number"
-              min="1900"
-              placeholder="Year"
-              required
-            />
-            <input id="car-make" type="text" placeholder="Make" _required_ />
-            <input id="car-model" type="text" placeholder="Model" _required_ />
+            <input id="car-year" type="number" min="1900" placeholder="Year" />
+            <input id="car-make" type="text" placeholder="Make" />
+            <input id="car-model" type="text" placeholder="Model" />
           </div>
         </div>
         <div class="input-field" id="start-date-field">
           <label for="start-date">Date parking</label>
-          <input id="start-date" type="date" _required_ />
+          <input id="start-date" type="date" />
         </div>
         <div class="input-field" id="days-field">
           <label for="days">Number of days</label>
-          <input id="days" type="number" min="1" max="30" _required_ />
+          <input id="days" type="number" min="1" max="30" required />
         </div>
         <div class="input-field" id="credit-card-field">
           <label for="credit-card">Credit Card</label>
-          <input id="credit-card" type="text" _required_ />
+          <input id="credit-card" type="text" required />
         </div>
         <div class="row">
           <div class="col">
@@ -48,7 +42,7 @@
               <input
                 id="cvv"
                 type="text"
-                _required_
+                required
                 title="Please enter a three digit number."
               />
             </div>
@@ -56,12 +50,7 @@
           <div class="col">
             <div class="input-field" id="expiration-field">
               <label for="expiration">Expiration</label>
-              <input
-                id="expiration"
-                type="text"
-                placeholder="MM/YY"
-                _required_
-              />
+              <input id="expiration" type="text" placeholder="MM/YY" required />
             </div>
           </div>
         </div>
