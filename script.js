@@ -10,7 +10,7 @@ formContainer.addEventListener('change', e => {
 
 function makeReservation(event) {
   event.preventDefault();
-  if (!validateForm()) return false;
+  // if (!validateForm()) return false;
   displayTotal(calculateTotal());
 }
 
@@ -18,15 +18,12 @@ function makeReservation(event) {
 //  Methods for Calculating and displaying Total
 //////////////////////////////////////////////////
 function calculateTotal() {
-  // Constants for offsetting Date object
-  const EST = 'T05:00:00';
-  const EDT = 'T04:00:00';
   // Array for looking up daily prices using 0-based values for days of the week starting with Sunday
   const prices = [7, 5, 5, 5, 5, 5, 7];
   // Get values from DOM and create Date object
   let days = +document.querySelector('#days').value;
-  const dateInput = document.querySelector('#start-date').value;
-  let date = new Date(`${dateInput}${EST}`);
+
+  let date = getStartDate();
   // Initialize total
   let total = 0;
   // Loop to calculate total
@@ -36,6 +33,15 @@ function calculateTotal() {
     date.setDate(date.getDate() + 1);
   }
   return total;
+}
+
+function getStartDate() {
+  // Constants for offsetting Date objects
+  const EST = 'T05:00:00';
+  const EDT = 'T04:00:00';
+  const TIME_ZONE = EST;
+  const dateInput = document.querySelector('#start-date').value;
+  return new Date(`${dateInput}${TIME_ZONE}`);
 }
 
 function displayTotal(total) {
@@ -106,6 +112,10 @@ function validateForm(e) {
     'car-year': function (e) {
       if (+e.value < 1900) fail('Please enter a year after 1899');
       if (+e.value > todayFullYear + 1) fail('Car cannot be from the future');
+      else pass();
+    },
+    'start-date': function (e) {
+      if (getStartDate() < today) fail('Date must be in the future');
       else pass();
     },
     days: function (e) {
