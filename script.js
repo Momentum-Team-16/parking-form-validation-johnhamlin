@@ -1,9 +1,19 @@
 'use strict';
 
 const formContainer = document.querySelector('.container');
-const totalDiv = document.querySelector('#total');
-
 formContainer.addEventListener('submit', makeReservation);
+formContainer.addEventListener('change', e => {
+  console.log(e.target.id);
+  validateForm(e.target);
+});
+// const allInputs = Array.from(document.querySelectorAll('input'));
+// allInputs.forEach(input => {
+//   input.addEventListener('focusout', event => {
+//     console.log(event);
+
+//     validateForm();
+//   });
+// });
 
 function makeReservation(event) {
   event.preventDefault();
@@ -36,6 +46,7 @@ function calculateTotal() {
 }
 
 function displayTotal(total) {
+  const totalDiv = document.querySelector('#total');
   const totalEl = document.createElement('p');
   totalEl.innerText = `Your total is $${total}`;
   totalDiv.appendChild(totalEl);
@@ -66,42 +77,47 @@ function luhnCheck(val) {
   return sum % 10 == 0;
 }
 
-function validateForm() {
-  const allInputs = Array.from(document.querySelectorAll('input'));
-  const carYearEl = document.querySelector('#car-year');
-  const daysEl = document.querySelector('#days');
-  const creditCardEl = document.querySelector('#credit-card');
-  const cvvEl = document.querySelector('#cvv');
+function validateForm(e) {
+  const fail = function (errorMsg) {
+    e.parentElement.classList.add('input-invalid');
+    e.setCustomValidity(errorMsg);
+    e.reportValidity();
+  };
 
-  if (+carYearEl.value < 1900) {
-    carYearEl.setCustomValidity('Please enter a year after 1899');
-    carYearEl.reportValidity();
-    return false;
-  }
+  const pass = function () {
+    e.parentElement.classList.remove('input-invalid');
+    e.setCustomValidity('');
+  };
 
-  if (+daysEl.value < 1 || +daysEl.value > 30) {
-    daysEl.setCustomValidity('Spaces are available for 1-30 days');
-    daysEl.reportValidity();
-    return false;
-  }
-
-  if (!validateCardNumber(creditCardEl.value)) {
-    creditCardEl.setCustomValidity('Enter a valid credit card number.');
-    creditCardEl.reportValidity();
-    return false;
-  }
-
-  if (!cvvEl.value.match(/^\d{3}$/)) {
-    cvvEl.setCustomValidity('Please enter a three digit CVV');
-    cvvEl.reportValidity();
-    return false;
-  }
+  // List of validation tests for each form item keyed by id
+  const validators = {
+    'car-year': function (e) {
+      if (+e.value < 1900) fail('Please enter a year after 1899');
+      else pass();
+    },
+    days: function (e) {
+      if (+e.value < 1 || +e.value > 30)
+        fail('Spaces are available for 1-30 days');
+      else pass();
+    },
+    'credit-card': function (e) {
+      if (!validateCardNumber(e.value))
+        fail('Enter a valid credit card number.');
+      else pass();
+    },
+    cvv: function (e) {
+      if (!e.value.match(/^\d{3}$/)) fail('Please enter a three digit CVV');
+      else pass();
+    },
+  };
+  validators[e.id]?.(e);
+  e.checkValidity(); // maybe check for blank separately
 
   // Check every <div> for required tag (or any other validation, which will lead to a misleading error message)
-  if (!allInputs.every(e => e.checkValidity())) {
-    alert('Please fill out all the fields');
-    return false;
-  }
+  // if (!allInputs.every(e => e.checkValidity())) {
+  //   alert('Please fill out all the fields');
+  //   return false;
+  // }
 
   return true;
 }
