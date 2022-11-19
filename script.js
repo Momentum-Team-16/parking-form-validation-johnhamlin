@@ -7,13 +7,6 @@ formContainer.addEventListener('change', e => {
   validateForm(e.target);
 });
 // const allInputs = Array.from(document.querySelectorAll('input'));
-// allInputs.forEach(input => {
-//   input.addEventListener('focusout', event => {
-//     console.log(event);
-
-//     validateForm();
-//   });
-// });
 
 function makeReservation(event) {
   event.preventDefault();
@@ -89,6 +82,27 @@ function validateForm(e) {
     e.setCustomValidity('');
   };
 
+  const checkExp = function (exp) {
+    // check for correct format
+    const expRegEx = /^((0[1-9])|(1[0-2]))\/\d\d$/;
+    if (!exp.match(expRegEx)) return false;
+    // if the format is correct, check the date
+    const today = new Date();
+    const todayMonth = today.getMonth();
+    const todayYear = today.getFullYear() % 100;
+    const expMonth = +exp.slice(0, 2);
+    const expYear = +exp.slice(3);
+    console.log(expMonth, expYear);
+    // Ensure date is in the future
+    if (
+      todayYear > expYear ||
+      (todayMonth >= expMonth && todayYear === expYear)
+    )
+      return false;
+
+    return true;
+  };
+
   // List of validation tests for each form item keyed by id
   const validators = {
     'car-year': function (e) {
@@ -109,9 +123,14 @@ function validateForm(e) {
       if (!e.value.match(/^\d{3}$/)) fail('Please enter a three digit CVV');
       else pass();
     },
+    expiration: function (e) {
+      if (!checkExp(e.value))
+        fail('Date must be in the future. Format must be MM/YY');
+      else pass();
+    },
   };
   validators[e.id]?.(e);
-  e.checkValidity(); // maybe check for blank separately
+  console.log(e.checkValidity()); // maybe check for blank separately
 
   // Check every <div> for required tag (or any other validation, which will lead to a misleading error message)
   // if (!allInputs.every(e => e.checkValidity())) {
