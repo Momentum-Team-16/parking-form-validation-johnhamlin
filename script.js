@@ -180,7 +180,7 @@ function validateForm(e) {
       if (e.value === '')
         return fail('Please enter the length of your reservation');
       if (+e.value < 1 || +e.value > 30)
-        fail('Spaces are available for 1-30 days');
+        return fail('Spaces are available for 1-30 days');
       return pass();
     },
     'credit-card': function (e) {
