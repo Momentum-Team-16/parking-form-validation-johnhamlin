@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 'use strict';
 
 //////////////////////////////////////////////////
@@ -19,12 +20,12 @@ formContainer.addEventListener('change', e => {
  * @returns The total price of the rental.
  */
 function calculateTotal() {
-  // Array for looking up daily prices using 0-based values for days of the week starting with Sunday
+  // Array for looking up daily prices using 0-based values for days of week starting with Sunday
   const prices = [7, 5, 5, 5, 5, 5, 7];
   // Get values from DOM and create Date object
   let days = +document.querySelector('#days').value;
 
-  let date = getStartDate();
+  const date = getStartDate();
   // Initialize total
   let total = 0;
   // Loop to calculate total
@@ -37,7 +38,7 @@ function calculateTotal() {
 }
 
 /**
- * It takes the value of the start date input, and returns a Date object with the time zone offset set
+ * It takes the value of the start date input, and returns a Date object with the time zone offset
  * to EST
  * @returns A new Date object with the date and timezone specified by the user.
  */
@@ -74,7 +75,7 @@ function displayTotal(total) {
  * @returns A boolean value.
  */
 function validateCardNumber(number) {
-  var regex = new RegExp('^[0-9]{16}$');
+  const regex = /^[0-9]{16}$/;
   if (!regex.test(number)) return false;
 
   return luhnCheck(number);
@@ -89,7 +90,7 @@ function luhnCheck(val) {
   var sum = 0;
   for (var i = 0; i < val.length; i++) {
     var intVal = parseInt(val.substr(i, 1));
-    if (i % 2 == 0) {
+    if (i % 2 === 0) {
       intVal *= 2;
       if (intVal > 9) {
         intVal = 1 + (intVal % 10);
@@ -97,7 +98,7 @@ function luhnCheck(val) {
     }
     sum += intVal;
   }
-  return sum % 10 == 0;
+  return sum % 10 === 0;
 }
 
 //////////////////////////////////////////////////
@@ -115,6 +116,7 @@ function makeReservation(event) {
   // Run validation on every input node and return early if any tests fail.
   if (!formInputs.every(input => validateForm(input))) return false;
   displayTotal(calculateTotal());
+  return true;
 }
 
 /**
@@ -132,6 +134,7 @@ function validateForm(e) {
     e.parentElement.classList.add('input-invalid');
     e.setCustomValidity(errorMsg);
     e.reportValidity();
+    return false;
   };
 
   const pass = function () {
@@ -155,58 +158,62 @@ function validateForm(e) {
 
   // List of validation tests for each form item keyed by id
   const validators = {
-    name: function (e) {
-      if (e.value == '') fail('Please enter your name');
-      else return pass();
+    name(e) {
+      if (e.value === '') return fail('Please enter your name');
+      return pass();
     },
     'car-year': function (e) {
-      if (+e.value < 1900) fail('Please enter a year after 1899');
-      else if (+e.value > todayFullYear + 1)
-        fail('Car cannot be from the future');
-      else if (e.value == '') fail('Please enter the year.');
-      else return pass();
+      if (e.value === '') return fail('Please enter the year.');
+      if (+e.value < 1900) return fail('Please enter a year after 1899');
+      if (+e.value > todayFullYear + 1)
+        return fail('Car cannot be from the future');
+      return pass();
     },
     'car-make': function (e) {
-      if (e.value == '') fail('Please enter the make');
-      else return pass();
+      if (e.value === '') return fail('Please enter the make');
+      return pass();
     },
     'car-model': function (e) {
-      if (e.value == '') fail('Please enter the model');
-      else return pass();
+      if (e.value === '') return fail('Please enter the model');
+      return pass();
     },
     'start-date': function (e) {
-      if (e.value == '') fail('Please enter the start date');
-      else if (getStartDate() < today) fail('Date must be in the future');
-      else return pass();
+      if (e.value === '') return fail('Please enter the start date');
+      if (getStartDate() < today) return fail('Date must be in the future');
+      return pass();
     },
-    days: function (e) {
+    days(e) {
+      if (e.value === '')
+        return fail('Please enter the length of your reservation');
       if (+e.value < 1 || +e.value > 30)
         fail('Spaces are available for 1-30 days');
-      else return pass();
+      return pass();
     },
     'credit-card': function (e) {
+      if (e.value === '') return fail('Please enter your credit card number');
       if (!validateCardNumber(e.value))
-        fail('Enter a valid credit card number.');
-      else return pass();
+        return fail('Invalid credit card number.');
+      return pass();
     },
-    cvv: function (e) {
-      if (!e.value.match(/^\d{3}$/)) fail('Please enter a three digit CVV');
-      else return pass();
+    cvv(e) {
+      if (e.value === '') return fail('Please enter your CVV');
+      if (!e.value.match(/^\d{3}$/)) return fail('CVV must be three digits');
+      return pass();
     },
-    expiration: function (e) {
+    expiration(e) {
       const expFormat = /^((0[1-9])|(1[0-2]))\/\d\d$/;
-      if (e.value == '') fail('Please enter the expiration date');
-      else if (!e.value.match(expFormat)) fail('Format must be MM/YY');
-      else if (!checkExpDate(e.value)) fail('Date must be in the future.');
-      else return pass();
+      if (e.value === '') return fail('Please enter the expiration date');
+      if (!e.value.match(expFormat)) return fail('Format must be MM/YY');
+      if (!checkExpDate(e.value)) return fail('Date must be in the future.');
+      return pass();
     },
   };
   // Don't think this is needed anymore. Not relying on html required tags
-  // if (!e.checkValidity()) fail('This field is required');
+  // if (!e.checkValidity()) return fail('This field is required');
   // else pass(); // maybe check for blank separately
 
   // If any of the tests failed, return false
-  if (!validators[e.id]?.(e)) return false;
+  if (!validators[e.id](e)) return false;
 
   return true;
 }
